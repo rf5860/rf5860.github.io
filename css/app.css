@@ -211,6 +211,45 @@ input[type="checkbox"] {
   display: block;
 }
 
+#todo-list .done div {
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
+#todo-list li .complete {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  margin: auto 0;
+  font-size: 22px;
+  color: #5ea824;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+#todo-list .done button {
+  display: none;
+}
+
+#todo-list li .complete:hover {
+  text-shadow: 0 0 1px #217c12,
+         0 0 10px rgba(61, 255, 0, 0.8);
+  -webkit-transform: scale(1.3);
+  -ms-transform: scale(1.3);
+  transform: scale(1.3);
+}
+
+#todo-list li .complete:after {
+  content: '✔';
+}
+
+#todo-list li:hover .complete {
+  display: block;
+}
+
 #todo-list li .edit {
   display: none;
 }

@@ -22,7 +22,8 @@
 		callback = callback || function () {};
 
 		var newItem = {
-			title: title.trim()
+			title: title.trim(),
+			complete: false
 		};
 
 		this.storage.save(newItem, callback);
@@ -71,13 +72,38 @@
 	};
 
 	/**
-	 * Removes a model from storage
+	 * Completes an item
 	 *
-	 * @param {number} id The ID of the model to remove
+	 * @param {number} id The ID of the model to complete
 	 * @param {function} callback The callback to fire when the removal is complete.
 	 */
-	Model.prototype.remove = function (id, callback) {
-		this.storage.remove(id, callback);
+	Model.prototype.complete = function (id, callback) {
+		var that = this;
+		this.read(id, function (item) {
+			that.storage.save({complete: !item[0].complete}, callback, item[0].id)
+		});
+	};
+
+	/**
+	 * Removes a model from storage
+	 *
+	 * @param  {string|number|object} [query] A query to match models against
+	 * @param {function} callback The callback to fire when the removal is complete.
+	 */
+	Model.prototype.remove = function (query, callback) {
+		var queryType = typeof query;
+		callback = callback || function () {};
+		if (queryType === 'string' || queryType === 'number') {
+			this.storage.remove(query, callback);
+		} else {
+			var that = this;
+			this.storage.find(query, function(data) {
+				for (var idx = 0;idx < data.length; idx++) {
+					that.storage.remove(data[idx].id, callback);
+				}
+			});
+		}
+
 	};
 
 	/**
@@ -100,8 +126,7 @@
 
 		this.storage.findAll(function (data) {
 			data.forEach(function (todo) {
-				todos.active++;
-
+				if (!todo.complete) todos.active++;
 				todos.total++;
 			});
 			callback(todos);

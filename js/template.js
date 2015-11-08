@@ -9,8 +9,9 @@
 	 */
 	function Template() {
 		this.defaultTemplate
-		=	'<li data-id="{{id}}">'
+		=	'<li data-id="{{id}}" class="{{complete}}">'
 		+		'<div class="view">'
+		+			'<button class="complete"></button>'
 		+			'<label>{{title}}</label>'
 		+			'<button class="destroy"></button>'
 		+		'</div>'
@@ -42,6 +43,7 @@
 
 			template = template.replace('{{id}}', data[i].id);
 			template = template.replace('{{title}}', data[i].title);
+			template = template.replace('{{complete}}', data[i].complete ? "done" : "active");
 
 			view = view + template;
 		}

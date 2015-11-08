@@ -21,6 +21,10 @@
 			that.editItem(item.id);
 		});
 
+		that.view.bind('clearCompleted', function () {
+			that.clearCompleted();
+		});
+
 		that.view.bind('itemEditDone', function (item) {
 			that.editItemSave(item.id, item.title);
 		});
@@ -31,6 +35,10 @@
 
 		that.view.bind('itemRemove', function (item) {
 			that.removeItem(item.id);
+		});
+
+		that.view.bind('itemComplete', function (item) {
+			that.completeItem(item.id);
 		});
 
 	}
@@ -58,11 +66,33 @@
 	};
 
 	/**
+	 * Removes all done tasks
+	 */
+	Controller.prototype.clearCompleted = function () {
+		var that = this;
+		that.model.remove({complete: true}, function (data) {
+			that.view.render('showEntries', data);
+		});
+
+		that._filter();
+	};
+
+	/**
 	 * Renders all active tasks
 	 */
 	Controller.prototype.showActive = function () {
 		var that = this;
-		that.model.read(function (data) {
+		that.model.read({complete: false}, function (data) {
+			that.view.render('showEntries', data);
+		});
+	};
+
+	/**
+	 * Renders all done tasks
+	 */
+	Controller.prototype.showDone = function () {
+		var that = this;
+		that.model.read({complete: true}, function (data) {
 			that.view.render('showEntries', data);
 		});
 	};
@@ -134,6 +164,18 @@
 		that._filter();
 	};
 
+	/*
+ 	 * Completes this item
+	 */
+	Controller.prototype.completeItem = function (id) {
+		var that = this;
+		that.model.complete(id, function () {
+			that.view.render('completeItem', id);
+		});
+
+		that._filter();
+	};
+
 	/**
 	 * Updates the pieces of the page which change depending on the remaining
 	 * number of todos.
@@ -157,7 +199,7 @@
 
 		// If the last active route isn't "All", or we're switching routes, we
 		// re-create the todo item elements, calling:
-		//   this.show[All|Active]();
+		//   this.show[All|Active|Done]();
 		if (force || this._lastActiveRoute !== 'All' || this._lastActiveRoute !== activeRoute) {
 			this['show' + activeRoute]();
 		}

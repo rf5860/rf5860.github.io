@@ -33,6 +33,13 @@
         }
     };
 
+    View.prototype._completeItem = function (id) {
+        var elem = qs('[data-id="' + id + '"]');
+        if (!elem) return;
+        if (elem.className.indexOf('done') >= 0) elem.className = elem.className.replace('done', '');
+        else elem.className += ' done';
+    };
+
     View.prototype._setFilter = function (currentPage) {
         qs('#filters .selected').className = '';
         qs('#filters [href="#/' + currentPage + '"]').className = 'selected';
@@ -80,6 +87,9 @@
             },
             removeItem: function () {
                 that._removeItem(parameter);
+            },
+            completeItem: function () {
+                that._completeItem(parameter);
             },
             updateElementCount: function () {
                 that.$todoItemCounter.innerHTML = that.template.itemCounter(parameter);
@@ -153,7 +163,17 @@
                 handler({id: that._itemId(this)});
             });
 
-        } else if (event === 'itemRemove') {
+        } else if (event === 'clearCompleted') {
+            $live('#clear-completed', 'click', function () {
+                handler();
+            });
+
+        } else if (event === 'itemComplete') {
+            $live('#todo-list .complete', 'click', function () {
+                handler({id: that._itemId(this)});
+            });
+
+        }  else if (event === 'itemRemove') {
             $live('#todo-list .destroy', 'click', function () {
                 handler({id: that._itemId(this)});
             });
